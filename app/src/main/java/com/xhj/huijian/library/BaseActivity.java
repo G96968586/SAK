@@ -16,6 +16,8 @@ import android.widget.Toast;
  */
 public abstract class BaseActivity extends FragmentActivity {
     private static final String TAG = BaseActivity.class.getCanonicalName();
+    private Intent mIntent;
+    private Bundle mBundle;
 
     /**
      * 获取 layout 的 id，具体由子类实现
@@ -26,10 +28,10 @@ public abstract class BaseActivity extends FragmentActivity {
 
     /**
      * 从 intent 中解析数据，具体子类来实现
-     *
-     * @param argIntent
+     * @param intent
+     * @param bundle
      */
-    protected void parseArgumentsFromIntent(Intent argIntent) {
+    protected void parseArgumentsFromIntent(Intent intent, Bundle bundle) {
     }
 
     /**
@@ -45,9 +47,14 @@ public abstract class BaseActivity extends FragmentActivity {
         // do something before setContentView
         beforeContentView();
         setContentView(getLayoutResId());
-        if (getIntent() != null) {
-            parseArgumentsFromIntent(getIntent());
+        // 拒绝本地服务漏洞
+        try {
+            mIntent = getIntent();
+            mBundle = mIntent != null ? mIntent.getExtras() : null;
+        } catch (Throwable throwable) {
+
         }
+        parseArgumentsFromIntent(mIntent, mBundle);
     }
 
     @Override
