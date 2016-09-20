@@ -10,6 +10,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.xhj.huijian.library.presenters.IPresenter;
+
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Created by Gavin on 16/7/17 下午9:10.
  * huijian.xhj@alibaba-inc.com
@@ -35,66 +40,10 @@ public abstract class BaseActivity extends FragmentActivity {
     }
 
     /**
-     * 提供 setContentView 方法之前处理一些业务
+     * 提供 setContentView 方法之前处理一些业务逻辑
      */
     protected void beforeContentView() {
 
-    }
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // do something before setContentView
-        beforeContentView();
-        setContentView(getLayoutResId());
-        // 拒绝本地服务漏洞
-        try {
-            mIntent = getIntent();
-            mBundle = mIntent != null ? mIntent.getExtras() : null;
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-        parseArgumentsFromIntent(mIntent, mBundle);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
     }
 
     /**
@@ -181,4 +130,116 @@ public abstract class BaseActivity extends FragmentActivity {
     public void forceExit(final String msg, final int time) {
         forceExit(msg, time, true);
     }
+
+    private Set<IPresenter> mAllPresenters = new HashSet<IPresenter>(1);
+
+    /**
+     * 需要子类来实现，获取子类的 IPresenter，一个 activity 有可能有多个 IPresenter
+     * @return
+     */
+    protected abstract IPresenter[] getPresenters();
+
+    /**
+     * 调用各 presenter 的 init 方法
+     */
+    protected abstract void callPresenterInitMethod();
+
+    /**
+     * 初始化 Presenters
+     */
+    private void initPresenters(){
+
+        IPresenter[] presenters = getPresenters();
+        int len = presenters.length;
+        if(presenters != null){
+            for(int i = 0; i < len; i++){
+                mAllPresenters.add(presenters[i]);
+            }
+        }
+        callPresenterInitMethod();
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // do something before setContentView
+        beforeContentView();
+        setContentView(getLayoutResId());
+        // 拒绝本地服务漏洞
+        try {
+            mIntent = getIntent();
+            mBundle = mIntent != null ? mIntent.getExtras() : null;
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+        parseArgumentsFromIntent(mIntent, mBundle);
+
+        initPresenters();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        for (IPresenter presenter : mAllPresenters) {
+            if (presenter != null) {
+                presenter.onStart();
+            }
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        for (IPresenter presenter: mAllPresenters) {
+            if (presenter != null) {
+                presenter.onResume();
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        for (IPresenter presenter: mAllPresenters) {
+            if (presenter != null) {
+                presenter.onPause();
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        for (IPresenter presenter: mAllPresenters) {
+            if (presenter != null) {
+                presenter.onStop();
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        for (IPresenter presenter: mAllPresenters) {
+            if (presenter != null) {
+                presenter.onDestroy();
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
 }
