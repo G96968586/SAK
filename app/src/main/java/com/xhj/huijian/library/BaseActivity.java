@@ -52,7 +52,7 @@ public abstract class BaseActivity extends FragmentActivity {
             mIntent = getIntent();
             mBundle = mIntent != null ? mIntent.getExtras() : null;
         } catch (Throwable throwable) {
-
+            throwable.printStackTrace();
         }
         parseArgumentsFromIntent(mIntent, mBundle);
     }
