@@ -4,10 +4,10 @@
 # commit message
 comment=$*
 
-echo $comment
+echo "$comment"
 
 if [ ! -n "$comment" ]; then
    git add . && git commit -m "update"
 else 
-   git add . && git commit -m $1
+   git add . && git commit -m "$comment"
 fi
