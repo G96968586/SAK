@@ -2,7 +2,9 @@
 # desc: git add and commit to local storage
 
 # commit message
-comment=$1
+comment=$*
+
+echo $comment
 
 if [ ! -n "$comment" ]; then
    git add . && git commit -m "update"
