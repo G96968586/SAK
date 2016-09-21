@@ -1,4 +1,4 @@
-package com.xhj.samples.activitiy;
+package com.xhj.samples.activity;
 
 import android.annotation.TargetApi;
 import android.content.Intent;

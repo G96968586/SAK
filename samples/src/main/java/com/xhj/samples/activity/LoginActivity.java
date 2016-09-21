@@ -1,6 +1,7 @@
-package com.xhj.samples.activitiy;
+package com.xhj.samples.activity;
 
 import android.annotation.TargetApi;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
 import android.support.design.widget.FloatingActionButton;
@@ -9,7 +10,6 @@ import android.support.v7.widget.CardView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.transition.Explode;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -89,12 +89,12 @@ public class LoginActivity extends SampleBaseActivity implements ILoginView{
     }
 
     @Override
-    public void showLoginView() {
+    public void showLoadingView() {
         showProgress("", "登录中");
     }
 
     @Override
-    public void hideLoginView() {
+    public void hideLoadingView() {
         hideProgress();
     }
 
@@ -116,6 +116,22 @@ public class LoginActivity extends SampleBaseActivity implements ILoginView{
             @Override
             public void onClick(View v) {
                 mLoginPresenter.login(mName.getText().toString(), mPassword.getText().toString());
+            }
+        });
+        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onClick(View v) {
+                getWindow().setExitTransition(null);
+                getWindow().setEnterTransition(null);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    ActivityOptions options =
+                            ActivityOptions.makeSceneTransitionAnimation(LoginActivity.this, mFloatingActionButton, mFloatingActionButton.getTransitionName());
+                    startActivity(new Intent(LoginActivity.this, RegisterActivity.class), options.toBundle());
+                } else {
+                    startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                }
             }
         });
     }

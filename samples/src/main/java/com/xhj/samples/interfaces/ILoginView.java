@@ -12,6 +12,6 @@ import com.xhj.samples.entity.UserInfo;
 public interface ILoginView extends IView {
     void onShowSuccessLoginView(UserInfo userInfo);
     void onShowFailedLoginView(int errorCode);
-    void showLoginView();
-    void hideLoginView();
+    void showLoadingView();
+    void hideLoadingView();
 }

@@ -1,8 +1,6 @@
 package com.xhj.samples.presenters;
 
-import com.xhj.huijian.library.interfaces.IView;
-import com.xhj.samples.SampleBaseActivity;
-import com.xhj.samples.activitiy.LoginActivity;
+import com.xhj.samples.activity.LoginActivity;
 import com.xhj.samples.entity.UserInfo;
 import com.xhj.samples.interfaces.ILoginPresenter;
 import com.xhj.samples.interfaces.ILoginView;
@@ -26,18 +24,18 @@ public class LoginPresenter implements ILoginPresenter {
             mActivity.show("密码不能少于6位");
             return;
         }
-        mLoginView.showLoginView();
+        mLoginView.showLoadingView();
         mLoginManager.login(name, password, new LoginListener() {
             @Override
             public void onSuccessLogin(UserInfo userInfo) {
                 mLoginView.onShowSuccessLoginView(userInfo);
-                mLoginView.hideLoginView();
+                mLoginView.hideLoadingView();
             }
 
             @Override
             public void onFailedLogin(int errorCode) {
                 mLoginView.onShowFailedLoginView(errorCode);
-                mLoginView.hideLoginView();
+                mLoginView.hideLoadingView();
             }
         });
     }

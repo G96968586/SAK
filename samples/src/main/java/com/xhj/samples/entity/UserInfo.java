@@ -9,4 +9,13 @@ package com.xhj.samples.entity;
 public class UserInfo {
     public String userId;
     public String userName;
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
