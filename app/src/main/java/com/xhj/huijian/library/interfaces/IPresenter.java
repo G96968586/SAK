@@ -1,6 +1,4 @@
-package com.xhj.huijian.library.presenters;
-
-import com.xhj.huijian.library.views.IView;
+package com.xhj.huijian.library.interfaces;
 
 /**
  * Created by Gavin on 16/9/20 下午11:42.

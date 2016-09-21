@@ -1,16 +1,17 @@
 package com.xhj.huijian.library;
 
-import android.content.Context;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.View;
+import android.view.Window;
 import android.widget.Toast;
 
-import com.xhj.huijian.library.presenters.IPresenter;
+import com.xhj.huijian.library.interfaces.IPresenter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,33 +19,14 @@ import java.util.Set;
 /**
  * Created by Gavin on 16/7/17 下午9:10.
  * huijian.xhj@alibaba-inc.com
+ * 基类,封装业务无关的业务逻辑
  */
 public abstract class BaseActivity extends FragmentActivity {
     private static final String TAG = BaseActivity.class.getCanonicalName();
     private Intent mIntent;
     private Bundle mBundle;
-
-    /**
-     * 获取 layout 的 id，具体由子类实现
-     *
-     * @return
-     */
-    protected abstract int getLayoutResId();
-
-    /**
-     * 从 intent 中解析数据，具体子类来实现
-     * @param intent
-     * @param bundle
-     */
-    protected void parseArgumentsFromIntent(Intent intent, Bundle bundle) {
-    }
-
-    /**
-     * 提供 setContentView 方法之前处理一些业务逻辑
-     */
-    protected void beforeContentView() {
-
-    }
+    protected ProgressDialog mProgressDialog;
+    private Set<IPresenter> mAllPresenters = new HashSet<IPresenter>(1);
 
     /**
      * 显示一个view控件
@@ -86,7 +68,7 @@ public abstract class BaseActivity extends FragmentActivity {
     }
 
     /**
-     * 强制退出app
+     * 强制退出app, 可以控制是否 show toast
      *
      * @param msg
      * @param time
@@ -131,7 +113,68 @@ public abstract class BaseActivity extends FragmentActivity {
         forceExit(msg, time, true);
     }
 
-    private Set<IPresenter> mAllPresenters = new HashSet<IPresenter>(1);
+    /**
+     * 采用默认主题的progress提示框
+     *
+     * @param title
+     * @param message
+     * @return
+     */
+    public ProgressDialog showProgress(String title, String message) {
+        return showProgress(title, message, -1);
+    }
+
+    /**
+     * 带主题样式参数的progress等待提示框
+     *
+     * @param title
+     * @param message
+     * @param theme
+     * @return
+     */
+    public ProgressDialog showProgress(String title, String message, int theme) {
+        if (mProgressDialog == null) {
+            if (theme > 0)
+                mProgressDialog = new ProgressDialog(this, theme);
+            else
+                mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mProgressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            mProgressDialog.setCanceledOnTouchOutside(false);// 不能取消
+            mProgressDialog.setIndeterminate(true);// 设置进度条是否不明确
+        }
+
+        if (mProgressDialog.isShowing())
+            return null;
+
+        if (!TextUtils.isEmpty(title))
+            mProgressDialog.setTitle(title);
+        mProgressDialog.setMessage(message);
+        mProgressDialog.show();
+        return mProgressDialog;
+    }
+
+    /**
+     * 取消提示框显示
+     */
+    public void hideProgress() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
+        }
+    }
+
+    public void disable(View view) {
+        if (null != view) {
+            view.setEnabled(false);
+        }
+    }
+
+    public void enable(View view) {
+        if (null != view) {
+            view.setEnabled(true);
+        }
+    }
 
     /**
      * 需要子类来实现，获取子类的 IPresenter，一个 activity 有可能有多个 IPresenter
@@ -157,6 +200,28 @@ public abstract class BaseActivity extends FragmentActivity {
             }
         }
         callPresenterInitMethod();
+    }
+
+    /**
+     * 获取 layout 的 id，具体由子类实现
+     *
+     * @return
+     */
+    protected abstract int getLayoutResId();
+
+    /**
+     * 从 intent 中解析数据，具体子类来实现
+     * @param intent
+     * @param bundle
+     */
+    protected void parseArgumentsFromIntent(Intent intent, Bundle bundle) {
+    }
+
+    /**
+     * 提供 setContentView 方法之前处理一些业务逻辑
+     */
+    protected void beforeContentView() {
+
     }
 
     @Override

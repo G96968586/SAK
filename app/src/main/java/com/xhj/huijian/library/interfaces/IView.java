@@ -1,4 +1,4 @@
-package com.xhj.huijian.library.views;
+package com.xhj.huijian.library.interfaces;
 
 /**
  * Created by Gavin on 16/7/17 下午9:57.
