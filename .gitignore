@@ -46,3 +46,6 @@ app/app.iml
 .idea
 # OSX files
 .DS_Store
+
+# projectFilesBackup
+projectFilesBackup/
