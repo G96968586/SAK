@@ -27,6 +27,10 @@ import com.xhj.samples.entity.UserInfo;
 import com.xhj.samples.interfaces.IRegisterView;
 import com.xhj.samples.presenters.RegisterPresenter;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * Created by Gavin on 16/9/21 下午8:15.
  * huijian.xhj@alibaba-inc.com
@@ -35,12 +39,19 @@ import com.xhj.samples.presenters.RegisterPresenter;
 
 public class RegisterActivity extends SampleBaseActivity implements IRegisterView {
     private static final String TAG = "RegisterActivity";
-    private FloatingActionButton mActionButton;
-    private CardView mCardView;
-    private Button mRegistButton;
-    private EditText mName;
-    private EditText mPassword;
-    private EditText mConfirmPassword;
+    @BindView(R.id.fab_close)
+    FloatingActionButton mActionButton;
+    @BindView(R.id.cv_add)
+    CardView mCardView;
+    @BindView(R.id.register_button)
+    Button mRegistButton;
+    @BindView(R.id.et_username)
+    EditText mName;
+    @BindView(R.id.et_password)
+    EditText mPassword;
+    @BindView(R.id.et_repeat_password)
+    EditText mConfirmPassword;
+
     private RegisterPresenter mRegisterPresenter = new RegisterPresenter();
     private TextWatcher mWatcher = new TextWatcher() {
         @Override
@@ -187,30 +198,11 @@ public class RegisterActivity extends SampleBaseActivity implements IRegisterVie
 
     @Override
     public void initView() {
-        mActionButton = (FloatingActionButton) findViewById(R.id.fab_close);
-        mCardView = (CardView) findViewById(R.id.cv_add);
-        mRegistButton = (Button) findViewById(R.id.bt_go);
-        mName = (EditText) findViewById(R.id.et_username);
-        mPassword = (EditText) findViewById(R.id.et_password);
-        mConfirmPassword = (EditText) findViewById(R.id.et_repeatpassword);
-        
+        ButterKnife.bind(this);
         disable(mRegistButton);
         mName.addTextChangedListener(mWatcher);
         mPassword.addTextChangedListener(mWatcher);
         mConfirmPassword.addTextChangedListener(mWatcher);
-        mRegistButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mRegisterPresenter.register(mName.getText().toString(), mPassword.getText().toString(), mConfirmPassword.getText().toString());
-            }
-        });
-        mActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                animateRevealClose();
-                Log.d(TAG, "i am here");
-            }
-        });
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             showEnterAnimation();
@@ -219,6 +211,16 @@ public class RegisterActivity extends SampleBaseActivity implements IRegisterVie
 
     @Override
     public void onBackPressed() {
+        animateRevealClose();
+    }
+
+    @OnClick(R.id.register_button)
+    public void register() {
+        mRegisterPresenter.register(mName.getText().toString(), mPassword.getText().toString(), mConfirmPassword.getText().toString());
+    }
+
+    @OnClick(R.id.fab_close)
+    public void close() {
         animateRevealClose();
     }
 }

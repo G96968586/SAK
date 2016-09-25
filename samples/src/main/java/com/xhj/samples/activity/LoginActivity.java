@@ -21,14 +21,37 @@ import com.xhj.samples.entity.UserInfo;
 import com.xhj.samples.interfaces.ILoginView;
 import com.xhj.samples.presenters.LoginPresenter;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class LoginActivity extends SampleBaseActivity implements ILoginView{
     private static final String TAG = "LoginActivity";
     private LoginPresenter mLoginPresenter = new LoginPresenter();
-    private EditText mName;
-    private EditText mPassword;
-    private Button mLoginButton;
-    private CardView mCardView;
-    private FloatingActionButton mFloatingActionButton;
+    @BindView(R.id.login_et_username)
+    EditText mName;
+    @BindView(R.id.login_et_password)
+    EditText mPassword;
+    @BindView(R.id.login_button)
+    Button mLoginButton;
+    @BindView(R.id.cv)
+    CardView mCardView;
+    @BindView(R.id.fab)
+    FloatingActionButton mFloatingActionButton;
+    /**
+     * 使用 ButterKnife 来控制 view 的 enabled 和 disable
+     */
+    private static final ButterKnife.Action<View> DISABLE = new ButterKnife.Action<View>() {
+        @Override public void apply(View view, int index) {
+            view.setEnabled(false);
+        }
+    };
+    private static final ButterKnife.Setter<View, Boolean> ENABLED = new ButterKnife.Setter<View, Boolean>() {
+        @Override public void set(View view, Boolean value, int index) {
+            view.setEnabled(value);
+        }
+    };
+
     /**
      * 两个输入框都非空时登录按钮才可点击
      */
@@ -41,9 +64,11 @@ public class LoginActivity extends SampleBaseActivity implements ILoginView{
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             if (mName.getText().length() > 0 && mPassword.getText().length() > 0) {
-                enable(mLoginButton);
+                ButterKnife.apply(mLoginButton, ENABLED, true);
+//                enable(mLoginButton);
             } else {
-                disable(mLoginButton);
+//                disable(mLoginButton);
+                ButterKnife.apply(mLoginButton, DISABLE);
             }
         }
 
@@ -103,36 +128,30 @@ public class LoginActivity extends SampleBaseActivity implements ILoginView{
      */
     @Override
     public void initView() {
-        mName = (EditText) findViewById(R.id.et_username);
-        mPassword = (EditText) findViewById(R.id.et_password);
-        mLoginButton = (Button) findViewById(R.id.bt_go);
-        mCardView = (CardView) findViewById(R.id.cv);
-        mFloatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
-
-        disable(mLoginButton);
+        ButterKnife.bind(this);
+        ButterKnife.apply(mLoginButton, DISABLE);
+//        disable(mLoginButton);
         mName.addTextChangedListener(mWatcher);
         mPassword.addTextChangedListener(mWatcher);
-        mLoginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mLoginPresenter.login(mName.getText().toString(), mPassword.getText().toString());
-            }
-        });
-        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-            @Override
-            public void onClick(View v) {
-                getWindow().setExitTransition(null);
-                getWindow().setEnterTransition(null);
+    }
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ActivityOptions options =
-                            ActivityOptions.makeSceneTransitionAnimation(LoginActivity.this, mFloatingActionButton, mFloatingActionButton.getTransitionName());
-                    startActivity(new Intent(LoginActivity.this, RegisterActivity.class), options.toBundle());
-                } else {
-                    startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
-                }
-            }
-        });
+    @OnClick(R.id.login_button)
+    public void login() {
+        mLoginPresenter.login(mName.getText().toString(), mPassword.getText().toString());
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @OnClick(R.id.fab)
+    public void floatingAction() {
+        getWindow().setExitTransition(null);
+        getWindow().setEnterTransition(null);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ActivityOptions options =
+                    ActivityOptions.makeSceneTransitionAnimation(LoginActivity.this, mFloatingActionButton, mFloatingActionButton.getTransitionName());
+            startActivity(new Intent(LoginActivity.this, RegisterActivity.class), options.toBundle());
+        } else {
+            startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+        }
     }
 }
