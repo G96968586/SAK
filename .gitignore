@@ -49,3 +49,9 @@ app/app.iml
 
 # projectFilesBackup
 projectFilesBackup/
+app/libs/
+app/src/main/java/com/xhj/huijian/library/presenters/
+app/src/main/java/com/xhj/huijian/library/ui/
+app/src/main/res/drawable/
+samples/libs/
+samples/src/main/java/com/xhj/samples/ui/
